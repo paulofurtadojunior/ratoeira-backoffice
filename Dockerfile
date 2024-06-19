@@ -1,10 +1,11 @@
-FROM node:16-alpine AS builder
-WORKDIR /app
-COPY . .
-RUN yarn install --frozen-lockfile
-RUN yarn build
+# Use a imagem base oficial mais atual do Node.js
+FROM node:current-alpine
 
-FROM node:16-alpine AS final
+# Crie e defina o diretório de trabalho
+WORKDIR /usr/src/app
+
+# Copie o arquivo package.json e package-lock.json para o diretório de trabalho
+COPY package*.json ./
 
 # --- START ---
 
@@ -14,11 +15,15 @@ ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
 
 # --- END ---
 
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.env.example .
-COPY package.json .
-COPY yarn.lock .
-RUN yarn install --frozen-lockfile --production
+# Instale as dependências do projeto
+RUN npm install
+
+# Copie todos os arquivos da aplicação para o diretório de trabalho
+COPY . .
+
+# Exponha a porta em que a aplicação irá rodar
 EXPOSE 3333
-CMD ["yarn", "start"]
+
+# Comando para iniciar a aplicação
+CMD ["node", "app.js"]
+
