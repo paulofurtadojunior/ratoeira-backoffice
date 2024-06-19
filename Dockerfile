@@ -3,7 +3,7 @@ FROM node:current-alpine
 
 # Defina variáveis de ambiente necessárias para o Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    PUPPETEER_EXECUTABLE_PATH=/node_modules/puppeteer/chromium-browser
 
 # Crie e defina o diretório de trabalho
 WORKDIR /app
