@@ -18,13 +18,6 @@ export const validadorPresellValidation = validation((getSchema) => ({
     )
 }));
 
-const delay = (time: number) => {
-    return new Promise((resolve) => {
-        setTimeout(resolve, time)
-    });
-}
-
-
 export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: Response) => {
 
     const apiResult: ApiResult = {
