@@ -1,5 +1,5 @@
 # Use a imagem base oficial mais atual do Node.js
-FROM golang:1.12-alpine as builder
+FROM node:current-alpine
 
 # Crie e defina o diretório de trabalho
 WORKDIR /app
@@ -22,8 +22,8 @@ RUN npm install
 COPY . .
 
 # Exponha a porta em que a aplicação irá rodar
-EXPOSE 3333
+EXPOSE 3000
 
 # Comando para iniciar a aplicação
-CMD ["npm", "start"]
+CMD [ "npm", "start" ]
 
