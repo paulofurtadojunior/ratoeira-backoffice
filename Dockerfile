@@ -1,8 +1,8 @@
 # Use a imagem base oficial mais atual do Node.js
-FROM node:current-alpine
+FROM golang:1.12-alpine as builder
 
 # Crie e defina o diretório de trabalho
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copie o arquivo package.json e package-lock.json para o diretório de trabalho
 COPY package*.json ./
@@ -25,5 +25,5 @@ COPY . .
 EXPOSE 3333
 
 # Comando para iniciar a aplicação
-CMD ["node", "app.js"]
+CMD ["npm", "start"]
 
