@@ -1,15 +1,6 @@
 # Use a imagem base oficial mais atual do Node.js
 FROM node:current-alpine
 
-# Instale dependências necessárias
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont
-
 # Defina variáveis de ambiente necessárias para o Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
