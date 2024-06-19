@@ -1,19 +1,24 @@
 # Use a imagem base oficial mais atual do Node.js
 FROM node:current-alpine
 
+# Instale dependências necessárias
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Defina variáveis de ambiente necessárias para o Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 # Crie e defina o diretório de trabalho
 WORKDIR /app
 
 # Copie o arquivo package.json e package-lock.json para o diretório de trabalho
 COPY package*.json ./
-
-# --- START ---
-
-RUN apk add --no-cache chromium ca-certificates
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
-ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
-
-# --- END ---
 
 # Instale as dependências do projeto
 RUN npm install
@@ -25,5 +30,4 @@ COPY . .
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
-CMD [ "npm", "start" ]
-
+CMD ["npm", "start"]
