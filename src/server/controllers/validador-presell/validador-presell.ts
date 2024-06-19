@@ -11,14 +11,12 @@ interface IRequestBody {
 }
 
 export const validadorPresellValidation = validation((getSchema) => ({
-
     body: getSchema<IRequestBody>(
         object({
             url: string().required()
         })
     )
 }));
-
 
 const delay = (time: number) => {
     return new Promise((resolve) => {
@@ -29,8 +27,6 @@ const delay = (time: number) => {
 
 export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: Response) => {
 
-    console.log('rodando aqui 2222');
-
     const apiResult: ApiResult = {
         data: {},
         errors: {},
@@ -38,7 +34,6 @@ export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: 
         success: true
     };
     const {url} = req.body;
-
     const scriptPart = 'https://api.ratoeiraads.com.br/script-ratoeira/';
 
     const notifications = [];
@@ -56,46 +51,29 @@ export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: 
             consoleMessages.push({type: msg.type(), text: msg.text()});
         });
 
-
+        const startTime = Date.now(); // Captura o timestamp inicial
         await Promise.all([
             page.goto(url, {
-                waitUntil: "domcontentloaded",
+                waitUntil: "networkidle2",
             }),
-            page.waitForNetworkIdle({ idleTime: 250 }),
+            page.waitForNetworkIdle({idleTime: 250}),
         ]);
+        const loadTime = Date.now() - startTime; // Calcula o tempo de carregamento em milissegundos
+        console.log(`Tempo de carregamento: ${loadTime} ms`);
 
+        notifications.push(
+            {
+                tipo: 'url',
+                status: true,
+                mensagem: url,
+            });
+        notifications.push(
+            {
+                status: true,
+                tipo: 'page_load',
+                mensagem: loadTime,
+            });
 
-        // console.time("goto");
-        // await page.goto(url, {
-        //     waitUntil: 'networkidle2',
-        //     timeout: 120000 // Tempo limite aumentado (em milissegundos)
-        // }).catch((err) => console.log("error loading url", err));
-        // console.timeEnd("goto");
-
-
-        const visitaRegistrada = consoleMessages.find(x => x.text && x.text.includes('VISITA REGISTRADA'));
-
-        if (visitaRegistrada) {
-            notifications.push(
-                {
-                    sucesso: true,
-                    mensagem: 'Visita Registrada com sucesso',
-                    ordem: 1
-                });
-            apiResult.data = notifications;
-        }
-
-        const ratoeiraDesativada = consoleMessages.find(x => x.text && x.text.includes('RATOEIRA DESATIVADA'));
-
-        if (ratoeiraDesativada) {
-            notifications.push(
-                {
-                    sucesso: true,
-                    mensagem: 'ATENÇÃO - A RATOEIRA ESTÁ DESATIVADA',
-                    ordem: 1
-                });
-            apiResult.data = notifications;
-        }
 
         // Verificar se o script contendo a parte da URL foi carregado
         const scriptLoaded = await page.evaluate((scriptPart) => {
@@ -104,70 +82,137 @@ export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: 
         }, scriptPart);
 
         if (!scriptLoaded) {
-            await browser.close();
             notifications.push(
                 {
-                    sucesso: false,
+                    status: false,
+                    tipo: 'msg',
                     mensagem: 'ATENÇÃO - Instalação mal sucedida! O script da Ratoeira não foi encontrado na página',
-                    ordem: 2
                 });
             apiResult.data = notifications;
             return res.status(StatusCodes.CREATED).json(apiResult);
         } else {
             notifications.push(
                 {
-                    sucesso: true,
+                    status: true,
+                    tipo: 'msg',
                     mensagem: 'Instalação realizada com sucesso! O script da Ratoeira foi encontrado na página!',
-                    ordem: 2
                 });
-            apiResult.data = notifications;
         }
 
-        console.log('before waiting');
-        await delay(10000);
-        console.log('after waiting');
-
-        // Verificar se os links e botões contêm um parâmetro específico que começa com 'vst_'
-        const validLinks = await page.evaluate(() => {
-            const elements = Array.from(document.querySelectorAll('a[href], button[onclick]'));
-            return elements.every(el => {
-                const href = el.getAttribute('href') || '';
-
-                console.log('href', href);
-
-                const onclick = el.getAttribute('onclick') || '';
-                return href.includes('vst_') || onclick.includes('vst_');
-            });
-        });
-
-        await page.screenshot({ path: `presell.png` });
-        await browser.close();
-
-        console.log('validLinks', validLinks);
-
-        if (validLinks) {
+        const visitaRegistrada = consoleMessages.find(x => x.text && x.text.includes('VISITA REGISTRADA'));
+        if (visitaRegistrada) {
             notifications.push(
                 {
-                    sucesso: true,
-                    mensagem: 'Links e botões contêm o parâmetro corretamente',
-                    ordem: 3
+                    status: true,
+                    tipo: 'msg',
+                    mensagem: 'Visita Registrada com sucesso',
                 });
-            apiResult.data = notifications;
+        }
+
+        const ratoeiraDesativada = consoleMessages.find(x => x.text && x.text.includes('RATOEIRA DESATIVADA'));
+
+        if (ratoeiraDesativada) {
+            notifications.push(
+                {
+                    status: false,
+                    tipo: 'msg',
+                    mensagem: 'ATENÇÃO - A RATOEIRA ESTÁ DESATIVADA',
+                });
+        }
+
+        const variableToCheck: string = 'idVisita';
+
+        // Verifica se a variável específica está definida no contexto da página
+        const variableLoaded = await page.evaluate((variableToCheck) => {
+            return typeof (window as any)[variableToCheck] !== 'undefined';
+        }, variableToCheck);
+
+        console.log('variableLoaded', variableLoaded);
+
+        // Obtém todos os botões e links
+        const elements = await page.evaluate(() => {
+            const elements: any[] = [];
+            // Seleciona todos os links
+            const links = document.querySelectorAll('a');
+            links.forEach(link => {
+                elements.push({
+                    type: 'link',
+                    href: link.href
+                });
+            });
+
+            // Seleciona todos os botões
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                const onClick = button.getAttribute('onclick');
+                if (onClick) {
+                    elements.push({
+                        type: 'button',
+                        onclick: onClick
+                    });
+                }
+            });
+
+            return elements;
+        });
+
+        // Verifica se 'vst_' está presente na URL dos links ou no atributo onclick dos botões
+        const filteredElements = elements.filter(element => {
+            if (element.type === 'link') {
+                return element.href.includes('vst_');
+            } else if (element.type === 'button') {
+                return element.onclick.includes('vst_');
+            }
+        });
+
+        // Exibe os elementos encontrados
+        console.log('Elementos com "vst_" na URL ou onclick:', filteredElements);
+
+        if (filteredElements && filteredElements.length > 0) {
+            notifications.push(
+                {
+                    status: true,
+                    tipo: 'link',
+                    mensagem: JSON.stringify(filteredElements),
+                });
+            notifications.push(
+                {
+                    status: true,
+                    tipo: 'msg',
+                    mensagem: 'Links e botões contêm o parâmetro corretamente',
+                });
         } else {
             notifications.push(
                 {
-                    sucesso: false,
+                    status: false,
+                    tipo: 'msg',
                     mensagem: 'ATENÇÃO - Links e botões NÃO contêm o parâmetro corretamente',
-                    ordem: 3
                 });
-
-            apiResult.data = notifications;
         }
+
+        // Tira o screenshot
+        const screenshotBuffer = await page.screenshot({ quality: 20, type: 'jpeg'});
+        // Converte a imagem para base64
+        const screenshotBase64 = screenshotBuffer.toString('base64');
+
+        if (screenshotBase64) {
+            notifications.push(
+                {
+                    status: true,
+                    tipo: 'screenshot',
+                    mensagem: screenshotBase64,
+                });
+        }
+
+
+        await browser.close();
+
     } catch (error) {
         console.log('error', error);
-        res.status(500).json({message: 'Erro ao verificar links e botões'});
+        res.status(500).json({message: 'Erro ao verificar a URL'});
     }
 
 
+    apiResult.data = notifications;
     return res.status(StatusCodes.CREATED).json(apiResult);
 };
