@@ -6,5 +6,4 @@ const startServer = () => {
         console.log('BackOffice Rodando na porta ' + `${process.env.PORT || 3333}`);
     });
 };
-
 startServer();
