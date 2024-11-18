@@ -33,7 +33,12 @@ export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: 
 
     try {
 
-        const browser = await puppeteer.launch({headless: true});
+        const browser = await puppeteer.launch(
+            {
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                headless: true
+            }
+        );
         const page = await browser.newPage();
 
         // Armazenar mensagens do console
@@ -184,7 +189,7 @@ export const validadorPresell = async (req: Request<{}, {}, IRequestBody>, res: 
         }
 
         // Tira o screenshot
-        const screenshotBuffer = await page.screenshot({ quality: 20, type: 'jpeg'});
+        const screenshotBuffer = await page.screenshot({quality: 20, type: 'jpeg'});
         // Converte a imagem para base64
         const screenshotBase64 = screenshotBuffer.toString('base64');
 

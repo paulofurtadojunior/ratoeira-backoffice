@@ -7,7 +7,8 @@
     "start": "ts-node-dev ./src/index.ts",
     "build": "yarn tsc",
     "preproduction": "yarn tsc",
-    "production": "node ./build/index.js"
+    "production": "node ./build/index.js",
+    "postinstall": "npx puppeteer install"
   },
   "keywords": [],
   "author": "Paulo Furtado",
