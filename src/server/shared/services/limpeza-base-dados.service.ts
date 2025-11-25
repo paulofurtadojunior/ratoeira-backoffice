@@ -11,7 +11,7 @@ export const deletarDadosLinkVisitaAcessoParametros = async (): Promise<void | E
             return;
         }
         else{
-            logInfo(`Inicio do processo`);
+            logInfo(`Inicio do processo de exclusão de dados da link_visita_acesso_parametro`);
             const limiteLinhasAExcluir = Number(parametros.find(p => p.nome === 'qtd_maxima_registros_para_excluir')?.defaultValue) ?? 1000000;
             const LinhasAExcluirPorBatch = Number(parametros.find(p => p.nome === 'qtd_registros_batch')?.defaultValue) ?? 10000;
 
