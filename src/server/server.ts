@@ -21,7 +21,8 @@ process.on('exit', (code) => {
     console.log('Process exit event with code: ', code);
 });
 
-cron.schedule('0 15 20 * * *', () => {
+
+cron.schedule('0 20 22 * * *', () => {
     console.log('Executando cronjob nos horários 12h, 13h, 14h e 15h...');
     LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros();
 });

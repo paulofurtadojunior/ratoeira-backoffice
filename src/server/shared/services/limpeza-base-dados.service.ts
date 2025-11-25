@@ -2,6 +2,7 @@ import {linkVisitaAcessoParametroProvider} from "../../database/providers/link-v
 import {FirebaseService} from "./firebase.service";
 import {FirebaseParameter} from "../models/firebase-parameter";
 import {logError, logInfo} from "./logger.service";
+import moment from "moment";
 
 export const deletarDadosLinkVisitaAcessoParametros = async (): Promise<void | Error> => {
     try{
@@ -11,7 +12,7 @@ export const deletarDadosLinkVisitaAcessoParametros = async (): Promise<void | E
             return;
         }
         else{
-            logInfo(`Inicio do processo de exclusão de dados da link_visita_acesso_parametro`);
+            logInfo(`Inicio do processo de exclusão de dados da link_visita_acesso_parametro ` + moment().format().toString());
             const limiteLinhasAExcluir = Number(parametros.find(p => p.nome === 'qtd_maxima_registros_para_excluir')?.defaultValue) ?? 1000000;
             const LinhasAExcluirPorBatch = Number(parametros.find(p => p.nome === 'qtd_registros_batch')?.defaultValue) ?? 10000;
 
@@ -23,7 +24,7 @@ export const deletarDadosLinkVisitaAcessoParametros = async (): Promise<void | E
                 console.log(`Sucesso ao deletar \`${registrosExcluidos}\` registros antigos.`);
                 logInfo(`Sucesso ao deletar \`${registrosExcluidos}\` registros antigos.`);
             }
-            logInfo(`Fim do processo`);
+            logInfo(`Fim do processo de exclusão de dados da link_visita_acesso_parametro ` + moment().format().toString());
         }
     } catch (error){
         console.error(error);
