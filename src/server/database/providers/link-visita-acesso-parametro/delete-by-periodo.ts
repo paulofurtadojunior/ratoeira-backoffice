@@ -15,20 +15,20 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
         let deletedCount = 0;
 
         while (deletedCount < MAX_DAILY) {
-            const result = await knexBaseTeste.raw(
-               ` WITH apagar AS (
-                            SELECT id
-                            FROM ${ETableNames.link_visita_acesso_parametro}
-                            WHERE created_at < (now() - interval '6 months')
-                            ORDER BY created_at ASC
-                            LIMIT ?
+            const consulta = `WITH apagar AS (
+                                    SELECT id
+                                    FROM ${ETableNames.link_visita_acesso_parametro}
+                                    WHERE created_at < (now() - interval '6 months')
+                                    ORDER BY created_at ASC
+                                    LIMIT ${BATCH_SIZE}
                                     )
-                            DELETE FROM ${ETableNames.link_visita_acesso_parametro} p
-                            USING apagar
-                            WHERE p.id = apagar.id;
-                            `, [BATCH_SIZE]);
+                              DELETE FROM ${ETableNames.link_visita_acesso_parametro} p
+                              USING apagar
+                              WHERE p.id = apagar.id;`;
 
-            const rows = result.rows.length;
+            const result = await knexBaseTeste.raw(consulta);
+
+            const rows = result.rowCount;
 
             if (rows === 0) break;
 
