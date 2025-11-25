@@ -9,7 +9,7 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
             filtroCliente = ' AND ' + listaClientes.join(',');
         }
         const MAX_DAILY = batchMax;
-        const BATCH_SIZE = 10;
+        const BATCH_SIZE = batchSize;
         const WAIT_MS = 100;
 
         let deletedCount = 0;
