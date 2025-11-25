@@ -4,7 +4,9 @@ import {LogtailTransport} from '@logtail/winston';
 
 // Criar cliente do Logtail
 const bearer = process.env.LOGTAIL_BEARER_TOKEN;
-const logtail = new Logtail(bearer ?? '');
+const logtail = new Logtail(bearer ?? '', {
+    endpoint: process.env.LOGTAL_BETTER_STACK_ENDPOINT}
+);
 
 // Criar logger Winston com transporte Logtail
 export const logger = winston.createLogger({
