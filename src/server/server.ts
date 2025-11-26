@@ -23,12 +23,12 @@ process.on('exit', (code) => {
 });
 
 
-cron.schedule('0 */30 0,1,2,5,6,7 * * *', () => {
+cron.schedule('0 */30 3,4,5,8,9,10 * * *', () => {
     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
     LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(true);
 });
 
-cron.schedule('0 */30 8-23 * * *', () => {
+cron.schedule('0 */30 11-23,0-2 * * *', () => {
     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
     LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
 });
