@@ -1,5 +1,6 @@
 import {ETableNames} from "../../ETableNames";
 import {knexBaseTeste} from "../../knex";
+import moment from "moment";
 
 export const deleteByPeriodo = async (batchMax: number, batchSize: number, listaClientes: Array<number> | null): Promise<number | Error> => {
     try {
@@ -11,8 +12,7 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
         const MAX_DAILY = batchMax;
         const BATCH_SIZE = batchSize;
         const WAIT_MS = 100;
-        const cutoff = new Date();
-        cutoff.setMonth(cutoff.getMonth() - 6); //seta a data para 6 meses atrás
+        const cutoff = moment().subtract(6, 'months').format('YYYY-MM-DD');//seta a data para 6 meses atrás
 
         let deletedCount = 0;
 
@@ -20,7 +20,7 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
             const consulta = `WITH apagar AS (
                                     SELECT id
                                     FROM ${ETableNames.link_visita_acesso_parametro}
-                                    WHERE created_at < :cutoff
+                                    WHERE created_at < '${cutoff}'
                                     ORDER BY created_at ASC
                                     LIMIT ${BATCH_SIZE}
                                     )
@@ -74,6 +74,6 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
         // return result.rows > 0;
 
     } catch (error) {
-        return new Error('Erro ao deletar o registro');
+        return new Error('Erro ao deletar o registro ' + error);
     }
 }
