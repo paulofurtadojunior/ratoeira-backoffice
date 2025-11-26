@@ -6,6 +6,7 @@ import process from 'node:process';
 import cron from 'node-cron';
 import {LimpezaDaseDadosService} from "./shared/services/limpeza-base-dados.service";
 import {logInfo} from "./shared/services/logger.service";
+import moment from "moment";
 
 const server = express();
 server.use(express.json());
@@ -22,9 +23,14 @@ process.on('exit', (code) => {
 });
 
 
-cron.schedule('0 */30 0,1,2,3,4,5,6,7,8,9 * * *', () => {
-    console.log('Executando cronjob nos horários 12h, 13h, 14h e 15h...');
-    LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros();
+cron.schedule('0 */30 0,1,2,5,6,7 * * *', () => {
+    console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
+    LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(true);
+});
+
+cron.schedule('0 */30 8-23 * * *', () => {
+    console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
+    LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
 });
 
 

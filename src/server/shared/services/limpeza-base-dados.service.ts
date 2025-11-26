@@ -4,17 +4,19 @@ import {FirebaseParameter} from "../models/firebase-parameter";
 import {logError, logInfo} from "./logger.service";
 import moment from "moment";
 
-export const deletarDadosLinkVisitaAcessoParametros = async (): Promise<void | Error> => {
+export const deletarDadosLinkVisitaAcessoParametros = async (dobrarQuantidade: boolean): Promise<void | Error> => {
     try{
-        const parametros: FirebaseParameter[] = await FirebaseService.getParametersByGroup('drop_dado_database');
+        const parametros: FirebaseParameter[] = await FirebaseService.getParametersByGroup('raads-backoffice');
 
         if (parametros.find(p => p.nome === 'habilitar_drop_data_raads_pg')?.defaultValue !== 'true') {
             return;
         }
         else{
             logInfo(`Inicio do processo de exclusão de dados da link_visita_acesso_parametro ` + moment().format().toString());
-            const limiteLinhasAExcluir = Number(parametros.find(p => p.nome === 'qtd_maxima_registros_para_excluir')?.defaultValue) ?? 1000000;
-            const LinhasAExcluirPorBatch = Number(parametros.find(p => p.nome === 'qtd_registros_batch')?.defaultValue) ?? 10000;
+            const paramQtdMaxima = Number(parametros.find(p => p.nome === 'qtd_maxima_registros_para_excluir')?.defaultValue) ?? 100000;
+            const paramBatch = Number(parametros.find(p => p.nome === 'qtd_registros_batch')?.defaultValue) ?? 5000;
+            const limiteLinhasAExcluir = dobrarQuantidade ? paramQtdMaxima * 2 : paramQtdMaxima;
+            const LinhasAExcluirPorBatch = dobrarQuantidade ? paramBatch * 2 : paramBatch;
 
             const registrosExcluidos = await linkVisitaAcessoParametroProvider.deleteByPeriodo(limiteLinhasAExcluir, LinhasAExcluirPorBatch, null);
 
