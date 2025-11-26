@@ -11,6 +11,8 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
         const MAX_DAILY = batchMax;
         const BATCH_SIZE = batchSize;
         const WAIT_MS = 100;
+        const cutoff = new Date();
+        cutoff.setMonth(cutoff.getMonth() - 6); //seta a data para 6 meses atrás
 
         let deletedCount = 0;
 
@@ -18,7 +20,7 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
             const consulta = `WITH apagar AS (
                                     SELECT id
                                     FROM ${ETableNames.link_visita_acesso_parametro}
-                                    WHERE created_at < (now() - interval '6 months')
+                                    WHERE created_at < :cutoff
                                     ORDER BY created_at ASC
                                     LIMIT ${BATCH_SIZE}
                                     )
