@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import {router} from './routes';
+import {initBullMonitor} from './filas/bull-monitor';
 import 'dotenv/config';
 import process from 'node:process';
 import cron from 'node-cron';
@@ -9,8 +10,6 @@ import {logInfo} from "./shared/services/logger.service";
 import moment from "moment";
 
 const server = express();
-server.use(express.json());
-
 server.use(cors());
 
 logInfo('Iniciando o Raads-Backoffice');
@@ -33,6 +32,26 @@ cron.schedule('0 */30 11-23,0-2 * * *', () => {
     LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
 });
 
+server.use(express.json());
+
+// Inicializar Bull Monitor e adicionar rota com autenticação
+(async () => {
+    try {
+        const basicAuth = require('express-basic-auth');
+        const bullMonitorRouter = await initBullMonitor();
+        
+        // Adicionar autenticação básica antes do router do bull-monitor
+        server.use('/filas', basicAuth({
+            users: {'admin': 'f1L45Rat031rAaDs_'},
+            challenge: true
+        }));
+        
+        server.use('/filas', bullMonitorRouter);
+        logInfo('Bull Monitor inicializado com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar Bull Monitor:', error);
+    }
+})();
 
 server.use(router);
 
