@@ -8,6 +8,7 @@ import cron from 'node-cron';
 import {LimpezaDaseDadosService} from "./shared/services/limpeza-base-dados.service";
 import {logInfo} from "./shared/services/logger.service";
 import moment from "moment";
+import { GoogleBotValidationService } from './shared/services/google-bot-service/google-validation-service';
 
 const server = express();
 server.use(cors());
@@ -21,6 +22,10 @@ process.on('exit', (code) => {
     console.log('Process exit event with code: ', code);
 });
 
+cron.schedule('0 */30 3,15 * * *', () => {
+    console.log('Executando cronjob de exclusão de busca de range de ips de bot do google: ' + moment().format().toString());
+    GoogleBotValidationService.loadGoogleIpRanges();
+});
 
 cron.schedule('0 */30 3,4,5,8,9,10 * * *', () => {
     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
