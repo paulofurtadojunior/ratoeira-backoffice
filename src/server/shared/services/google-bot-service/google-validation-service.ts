@@ -121,12 +121,12 @@ export const loadGoogleIpRanges = async (): Promise<void> => {
             const rawBotCidrs = [
                 ...extractCidrsFromGoogleJson(botJson),
                 ...extractCidrsFromGoogleJson(specialJson),
-                ...extractCidrsFromGoogleJson(userFetchJson),
                 ...CUSTOM_BOT_CIDRS,
             ];
     
             const rawInfraCidrs = [
                 ...extractCidrsFromGoogleJson(infraJson),
+                ...extractCidrsFromGoogleJson(userFetchJson),
                 ...CUSTOM_INFRA_CIDRS,
             ];
     
