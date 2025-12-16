@@ -5,9 +5,10 @@ import {initBullMonitor} from './filas/bull-monitor';
 import 'dotenv/config';
 import process from 'node:process';
 import cron from 'node-cron';
-import {LimpezaDaseDadosService} from "./shared/services/limpeza-base-dados.service";
+import {deletarDadosLinkVisitaAcesso, LimpezaDaseDadosService} from "./shared/services/limpeza-base-dados.service";
 import {logInfo} from "./shared/services/logger.service";
 import moment from "moment";
+import { GoogleBotValidationService } from './shared/services/google-bot-service/google-validation-service';
 
 const server = express();
 server.use(cors());
@@ -21,6 +22,10 @@ process.on('exit', (code) => {
     console.log('Process exit event with code: ', code);
 });
 
+cron.schedule('0 */30 3,15 * * *', () => {
+    console.log('Executando cronjob de exclusão de busca de range de ips de bot do google: ' + moment().format().toString());
+    GoogleBotValidationService.loadGoogleIpRanges();
+});
 
 cron.schedule('0 */30 3,4,5,8,9,10 * * *', () => {
     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
@@ -30,6 +35,57 @@ cron.schedule('0 */30 3,4,5,8,9,10 * * *', () => {
 cron.schedule('0 */30 11-23,0-2 * * *', () => {
     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
     LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
+});
+
+cron.schedule('0 */40 3,4,5,8,9,10 * * *', () => {
+    console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso: ' + moment().format().toString());
+    LimpezaDaseDadosService.deletarDadosLinkVisitaAcesso(true, 'googleBot');
+});
+
+let ultimaExecucaoDeleteGoogleBot = 0;
+
+cron.schedule('*/20 * * * *', () => {
+    const agora = moment();
+    const horaAtual = agora.hour();
+    let dobrarQuantidade = false;
+    if (horaAtual >= 3 && horaAtual < 10) {
+        dobrarQuantidade = true;
+    }
+
+    // Se estiver entre 3h e 4h, NÃO executar
+    if (horaAtual >= 6 && horaAtual < 7) {
+        return;
+    }
+
+    // Executa somente se passou 1h20 (80 min)
+    if (Date.now() - ultimaExecucaoDeleteGoogleBot >= 80 * 60 * 1000) {
+        ultimaExecucaoDeleteGoogleBot = Date.now();
+        console.log('🚀 Executando cron de exclusão de dados da tabela link_visita_acesso (intervalo 1h20): ' + agora.format());
+        LimpezaDaseDadosService.deletarDadosLinkVisitaAcesso(dobrarQuantidade, 'googleBot');
+    }
+});
+
+let ultimaExecucaoDeleteClienteInativo= 0;
+
+cron.schedule('*/20 * * * *', () => {
+    const agora = moment();
+    const horaAtual = agora.hour();
+    let dobrarQuantidade = false;
+    if (horaAtual >= 3 && horaAtual < 10) {
+        dobrarQuantidade = true;
+    }
+
+    // Se estiver entre 3h e 4h, NÃO executar
+    if (horaAtual >= 6 && horaAtual < 7) {
+        return;
+    }
+
+    // Executa somente se passou 1h40 (100 min)
+    if (Date.now() - ultimaExecucaoDeleteClienteInativo >= 100 * 60 * 1000) {
+        ultimaExecucaoDeleteClienteInativo = Date.now();
+        console.log('🚀 Executando cron de exclusão de dados da tabela link_visita_acesso (intervalo 1h40): ' + agora.format());
+        LimpezaDaseDadosService.deletarDadosLinkVisitaAcesso(dobrarQuantidade, 'clienteInativo');
+    }
 });
 
 server.use(express.json());
