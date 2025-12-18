@@ -1,5 +1,5 @@
 import {ETableNames} from "../../ETableNames";
-import {knexBaseTeste} from "../../knex";
+import {knexBaseTeste, myKnex} from "../../knex";
 import moment from "moment";
 
 export const deleteByPeriodo = async (batchMax: number, batchSize: number, listaClientes: Array<number> | null): Promise<number | Error> => {
@@ -28,7 +28,7 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
                               USING apagar
                               WHERE p.id = apagar.id;`;
 
-            const result = await knexBaseTeste.raw(consulta);
+            const result = await myKnex.raw(consulta);
 
             const rows = result.rowCount;
 
@@ -42,36 +42,6 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
         }
 
         return deletedCount;
-
-        // while (true) {
-        //     const ids = await knexBaseTeste(`${ETableNames.link_visita_acesso_parametro}`)
-        //         .where('created_at', '<', knexBaseTeste.raw(`now() - interval '6 months'`))
-        //         .orderBy('created_at')
-        //         .limit(BATCH)
-        //         .pluck('id');
-        //
-        //     if (ids.length === 0) break;
-        //
-        //     await knexBaseTeste(`${ETableNames.link_visita_acesso_parametro}`).whereIn('id', ids).delete();
-        //     // await knexBaseTeste.raw('VACUUM (ANALYZE) minha_tabela'); // opcional, não faça a cada lote se ficar pesado
-        //     await new Promise(r => setTimeout(r, 100)); // respiro
-        // }
-
-
-        // const consulta = `WITH apagar AS (
-        //                         SELECT id
-        //                         FROM ${ETableNames.link_visita_acesso_parametro}
-        //                         WHERE created_at < ${database}
-        //                         ${filtroCliente}
-        //                         ORDER BY created_at ASC
-        //                         LIMIT ${limite}
-        //                         )
-        //                   DELETE FROM ${ETableNames.link_visita_acesso_parametro} p
-        //                   USING apagar
-        //                   WHERE p.id = apagar.id;`;
-        // const result = await knexBaseTeste.raw(consulta);
-        //
-        // return result.rows > 0;
 
     } catch (error) {
         return new Error('Erro ao deletar o registro ' + error);
