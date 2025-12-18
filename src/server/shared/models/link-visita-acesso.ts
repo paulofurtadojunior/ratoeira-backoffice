@@ -1,0 +1,50 @@
+export interface ILinkVisitaAcesso {
+
+    id: number;
+    url: string;
+    user_agent?: string;
+    device?: string;
+    ip?: string;
+    is_bot?: number;
+    cliente_id?: number;
+    link_visita_configuration_id?: number;
+    localizacao?: string;
+    ip_info?: string;
+    is_rato?: number;
+    is_redirected?: number;
+    trafego_pago?: number;
+    google_bot?: number;
+    qtd_cliques?: number;
+    teve_clique?: number;
+    id_ads?: string;
+    pixel?: string;
+    tipo_ads?: string;
+    teve_venda?: number;
+    teve_checkout?: number;
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string;
+    track_id?: string;
+    quantidade_visita?: number;
+    link_visita_configuration_idd?: string;
+    vst_origem?: string;
+    referrer?: string;
+    hash_url?: string;
+    utm_id?: string;
+    utm_campaign?: string;
+    utm_term?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_content?: string;
+    network?: string;
+    placement?: string;
+    device_url?: string;
+    raads1?: string;
+    raads2?: string;
+    raads3?: string;
+    raads4?: string;
+    raads5?: string;
+    is_google_infra?: number | null;
+    is_google_infra_descricao?: string | null;
+
+}
