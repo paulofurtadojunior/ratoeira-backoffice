@@ -27,10 +27,12 @@ cron.schedule('0 */30 3,15 * * *', () => {
     GoogleBotValidationService.loadGoogleIpRanges();
 });
 
-cron.schedule('0 */30 5,6,7,8,9,10 * * *', () => {
-    console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
-    LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
-});
+LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
+
+// cron.schedule('0 */30 5,6,7,8,9,10 * * *', () => {
+//     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
+//     LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
+// });
 
 // cron.schedule('0 */30 11-23,0-2 * * *', () => {
 //     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
