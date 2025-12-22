@@ -40,41 +40,7 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
             await new Promise(r => setTimeout(r, WAIT_MS));
           }
         
-          return deletedCount;
-      
-          // Cria uma única transação
-        //   await myKnex.transaction(async (trx) => {
-        //       while (deletedCount < MAX_DAILY) {
-        //           const result = await trx.raw(
-        //               `
-        //               WITH apagar AS (
-        //                 SELECT id
-        //                 FROM ${ETableNames.link_visita_acesso_parametro}
-        //                 WHERE created_at < ?
-        //                 ORDER BY created_at ASC
-        //                 LIMIT ?
-        //               )
-        //               DELETE FROM ${ETableNames.link_visita_acesso_parametro} p
-        //               USING apagar
-        //               WHERE p.id = apagar.id
-        //               RETURNING 1;`,
-        //               [cutoff, BATCH_SIZE]
-        //           );
-  
-        //           const rows = result.rowCount ?? result.rows?.length ?? 0;
-  
-        //           if (rows === 0) break;
-  
-        //           deletedCount += rows;
-  
-        //           console.log(`Deletados ${rows} registros. Total: ${deletedCount}`);
-  
-        //           // Aguarda antes de continuar para evitar sobrecarregar o banco
-        //           await new Promise((resolve) => setTimeout(resolve, WAIT_MS));
-        //       }
-        //   });
-  
-        //   return deletedCount;        
+          return deletedCount;  
 
     } catch (error) {
         return new Error('Erro ao deletar o registro ' + error);
