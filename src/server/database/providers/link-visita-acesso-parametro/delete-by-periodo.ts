@@ -12,6 +12,8 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
 
         let deletedCount = 0;
 
+        console.log('Entrou no método de deleteByPeriodo do link_visita_acesso_parametro');
+
         while (deletedCount < MAX_DAILY) {
             const result = await myKnex.raw(
               `
@@ -24,14 +26,13 @@ export const deleteByPeriodo = async (batchMax: number, batchSize: number, lista
               )
               DELETE FROM ${ETableNames.link_visita_acesso_parametro} p
               USING apagar
-              WHERE p.id = apagar.id
-              RETURNING 1;`,
+              WHERE p.id = apagar.id;`,
               [cutoff, BATCH_SIZE]
             );
         
             const rows = result.rowCount ?? result.rows?.length ?? 0;
   
-                  if (rows === 0) break;
+            if (rows === 0) break;
         
             deletedCount += rows;
             console.log(`Deletados ${rows} registros. Total: ${deletedCount}`);

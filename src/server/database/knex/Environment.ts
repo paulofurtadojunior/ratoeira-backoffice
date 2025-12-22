@@ -65,7 +65,8 @@ export const production: Knex.Config = {
         database: process.env.DATABASE_NAME,
         password: process.env.DATABASE_PASSWORD,
         port: Number(process.env.DATABASE_PORT || 5432),
-        ssl: {rejectUnauthorized: false}
+        ssl: {rejectUnauthorized: false},
+        application_name: 'raads-backoffice'
     },
     pool: {
         min: 2,
