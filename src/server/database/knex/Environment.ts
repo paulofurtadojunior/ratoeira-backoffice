@@ -67,6 +67,12 @@ export const production: Knex.Config = {
         port: Number(process.env.DATABASE_PORT || 5432),
         ssl: {rejectUnauthorized: false}
     },
+    pool: {
+        min: 2,
+        max: 20,
+        acquireTimeoutMillis: 120000, // 2 minutos para adquirir uma conexão
+        idleTimeoutMillis: 30000, // 30 segundos de inatividade antes de liberar a conexão
+    }
 };
 
 export const productionReadOnly: Knex.Config = {
