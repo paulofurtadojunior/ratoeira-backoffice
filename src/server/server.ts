@@ -9,6 +9,7 @@ import {deletarDadosLinkVisitaAcesso, LimpezaDaseDadosService} from "./shared/se
 import {logInfo} from "./shared/services/logger.service";
 import moment from "moment";
 import { GoogleBotValidationService } from './shared/services/google-bot-service/google-validation-service';
+import { CriarParticoesService } from './shared/services/criar-particoes/criar-particoes.service';
 
 const server = express();
 server.use(cors());
@@ -28,6 +29,11 @@ cron.schedule('0 */30 3,15 * * *', () => {
 });
 
 LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
+
+// cron.schedule('0 */30 6 * * *', () => {
+//     console.log('Executando cronjob de criação de partições no banco de dados para tabelas particionadas');
+//     CriarParticoesService.createPartitions();
+// });
 
 // cron.schedule('0 */30 5,6,7,8,9,10 * * *', () => {
 //     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
