@@ -28,19 +28,15 @@ cron.schedule('0 */30 3,15 * * *', () => {
     GoogleBotValidationService.loadGoogleIpRanges();
 });
 
-(async () => {
+cron.schedule('0 */30 6 * * *', () => {
+    console.log('Executando cronjob de criação de partições no banco de dados para tabelas particionadas');
+    CriarParticoesService.createPartitions();
+});
+
+cron.schedule('0 */30 5,6,7,8,9,10 * * *', async () => {
+    console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
     await LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
-})();
-
-// cron.schedule('0 */30 6 * * *', () => {
-//     console.log('Executando cronjob de criação de partições no banco de dados para tabelas particionadas');
-//     CriarParticoesService.createPartitions();
-// });
-
-// cron.schedule('0 */30 5,6,7,8,9,10 * * *', async () => {
-//     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
-//     await LimpezaDaseDadosService.deletarDadosLinkVisitaAcessoParametros(false);
-// });
+});
 
 // cron.schedule('0 */30 11-23,0-2 * * *', () => {
 //     console.log('Executando cronjob de exclusão de dados da tabela link_visita_acesso_parametro: ' + moment().format().toString());
