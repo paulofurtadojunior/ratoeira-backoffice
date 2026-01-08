@@ -23,6 +23,8 @@ process.on('exit', (code) => {
     console.log('Process exit event with code: ', code);
 });
 
+// adicionando para buscar no start da aplicacao
+GoogleBotValidationService.loadGoogleIpRanges();
 cron.schedule('0 */30 3,15 * * *', () => {
     console.log('Executando cronjob de busca de range de ips de bot do google: ' + moment().format().toString());
     GoogleBotValidationService.loadGoogleIpRanges();
@@ -103,13 +105,13 @@ server.use(express.json());
     try {
         const basicAuth = require('express-basic-auth');
         const bullMonitorRouter = await initBullMonitor();
-        
+
         // Adicionar autenticação básica antes do router do bull-monitor
         server.use('/filas', basicAuth({
             users: {'admin': 'f1L45Rat031rAaDs_'},
             challenge: true
         }));
-        
+
         server.use('/filas', bullMonitorRouter);
         logInfo('Bull Monitor inicializado com sucesso');
     } catch (error) {
